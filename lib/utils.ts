@@ -55,6 +55,14 @@ export function calculatePoints(sweepstake: Sweepstake): Player[] {
     });
   });
 
+  Object.values(sweepstake.awards || {}).forEach((teamId) => {
+    players.forEach((player) => {
+      if (player.teams.includes(teamId)) {
+        player.points += 3;
+      }
+    });
+  });
+
   return players.sort((a, b) => b.points - a.points);
 }
 
@@ -79,41 +87,30 @@ export function createNewSweepstake(hostName: string, sweepstakeName: string): S
     fixtures: FIXTURES,
     createdAt: Date.now(),
     knockoutBonuses: {},
+    awards: {},
   };
 }
 
 export async function saveSweepstake(sw: Sweepstake): Promise<void> {
   const data = JSON.stringify(sw);
-  // Check if exists
   const checkRes = await fetch(
     `${SUPABASE_URL}/rest/v1/sweepstakes?sw_id=eq.${sw.id}&select=id`,
     { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
   );
   const existing = await checkRes.json();
-
   if (existing && existing.length > 0) {
     await fetch(`${SUPABASE_URL}/rest/v1/sweepstakes?sw_id=eq.${sw.id}`, {
       method: "PATCH",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ data }),
     });
   } else {
     await fetch(`${SUPABASE_URL}/rest/v1/sweepstakes`, {
       method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ sw_id: sw.id, data }),
     });
   }
-
-  // Also save to localStorage as cache
   if (typeof window !== "undefined") {
     localStorage.setItem(`sw_${sw.id}`, JSON.stringify(sw));
   }
@@ -126,9 +123,7 @@ export async function loadSweepstake(id: string): Promise<Sweepstake | null> {
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     const rows = await res.json();
-    if (rows && rows.length > 0) {
-      return JSON.parse(rows[0].data);
-    }
+    if (rows && rows.length > 0) return JSON.parse(rows[0].data);
   } catch {}
   return null;
 }

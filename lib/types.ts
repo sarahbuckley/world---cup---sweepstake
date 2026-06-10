@@ -12,7 +12,6 @@ export interface Fixture {
   scoreB?: number;
   result?: GameResult;
   played?: boolean;
-  // knockout stage bonus
   knockoutRound?: "roundOf32" | "roundOf16" | "quarterFinal" | "semiFinal" | "final";
 }
 
@@ -26,7 +25,7 @@ export interface Team {
 export interface Player {
   id: string;
   name: string;
-  teams: string[]; // team ids
+  teams: string[];
   points: number;
   joinedAt: number;
 }
@@ -40,6 +39,6 @@ export interface Sweepstake {
   players: Player[];
   fixtures: Fixture[];
   createdAt: number;
-  // track knockout bonuses separately
-  knockoutBonuses: Record<string, Record<string, number>>; // teamId -> {round: points}
+  knockoutBonuses: Record<string, Record<string, number>>;
+  awards: Record<string, string>;
 }
