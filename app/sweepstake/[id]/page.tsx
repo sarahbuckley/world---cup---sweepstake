@@ -408,3 +408,67 @@ export default function SweepstakePage({ params }: { params: Promise<{ id: strin
                             return (
                               <button key={teamId} onClick={() => !awarded && handleKnockoutBonus(teamId, key, pts)}
                                 className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${awarded ? "bg-green-100 text-green-700 cursor-default" : "bg-gray-100 hover:bg-green-100 text-gray-700"}`}>
+                                {team?.flag} {team?.name} {awarded && "✓"}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <h3 className="font-bold text-gray-900 mb-1">Tournament Awards</h3>
+                  <p className="text-sm text-gray-500 mb-4">Assign each award to the winning team (+3 pts each).</p>
+                  <div className="space-y-3">
+                    {TOURNAMENT_AWARDS.map(({ id: awardId, label, emoji, description }) => {
+                      const awarded = sw.awards?.[awardId];
+                      const awardedTeam = awarded ? getTeam(awarded) : null;
+                      return (
+                        <div key={awardId}>
+                          <div className="text-sm font-semibold text-gray-700 mb-1">
+                            {emoji} {label} <span className="text-gray-400 font-normal">· {description}</span>
+                            {awardedTeam && <span className="text-green-600 ml-1">→ {awardedTeam.flag} {awardedTeam.name} ✓</span>}
+                          </div>
+                          {!awarded && (
+                            <div className="flex flex-wrap gap-2">
+                              {sw.players.flatMap(p => p.teams).filter((v, i, a) => a.indexOf(v) === i).map((teamId) => {
+                                const team = getTeam(teamId);
+                                return (
+                                  <button key={teamId} onClick={() => handleAward(awardId, teamId)}
+                                    className="text-xs px-3 py-1.5 rounded-lg font-medium bg-gray-100 hover:bg-green-100 text-gray-700 hover:text-green-700 transition-colors">
+                                    {team?.flag} {team?.name}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-3">Points System</h3>
+              <div className="space-y-1 text-sm">
+                {[["Win", POINTS_SYSTEM.groupWin], ["Draw", POINTS_SYSTEM.groupDraw], ["Loss", POINTS_SYSTEM.groupLoss],
+                  ["Reach Round of 16", POINTS_SYSTEM.roundOf16], ["Quarter Final", POINTS_SYSTEM.quarterFinal],
+                  ["Semi Final", POINTS_SYSTEM.semiFinal], ["Runner Up", POINTS_SYSTEM.runnerUp],
+                  ["Winner 🏆", POINTS_SYSTEM.winner], ["Tournament Award 🥇", POINTS_SYSTEM.award],
+                ].map(([label, pts]) => (
+                  <div key={String(label)} className="flex justify-between text-gray-600">
+                    <span>{label}</span><span className="font-bold text-green-700">{pts} pts</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
