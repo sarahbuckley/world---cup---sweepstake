@@ -1,0 +1,153 @@
+import https from 'https';
+
+const SUPABASE_URL = "https://amcwesgzsyvhzdnkulbq.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtY3dlc2d6c3l2aHpkbmt1bGJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDcyNzMsImV4cCI6MjA5NjY4MzI3M30.7UduBMyK4QzLVL6m-s4iDphpkjAFjaW0GZx_VT8uwQQ";
+const SW_ID = "wgtlp4tt";
+
+const FIXTURES = [
+  { id:"f1",  date:"2026-06-11", time:"20:00 BST", teamA:"mexico",        teamB:"south-africa",   stage:"Group A", venue:"Mexico City Stadium" },
+  { id:"f2",  date:"2026-06-12", time:"03:00 BST", teamA:"south-korea",   teamB:"czech-republic", stage:"Group A", venue:"Estadio Guadalajara" },
+  { id:"f3",  date:"2026-06-18", time:"17:00 BST", teamA:"czech-republic",teamB:"south-africa",   stage:"Group A", venue:"Atlanta Stadium" },
+  { id:"f4",  date:"2026-06-19", time:"02:00 BST", teamA:"mexico",        teamB:"south-korea",    stage:"Group A", venue:"Estadio Guadalajara" },
+  { id:"f5",  date:"2026-06-25", time:"02:00 BST", teamA:"czech-republic",teamB:"mexico",         stage:"Group A", venue:"Mexico City Stadium" },
+  { id:"f6",  date:"2026-06-25", time:"02:00 BST", teamA:"south-africa",  teamB:"south-korea",    stage:"Group A", venue:"Estadio Monterrey" },
+  { id:"f7",  date:"2026-06-12", time:"20:00 BST", teamA:"canada",        teamB:"bosnia",         stage:"Group B", venue:"Toronto Stadium" },
+  { id:"f8",  date:"2026-06-13", time:"20:00 BST", teamA:"qatar",         teamB:"switzerland",    stage:"Group B", venue:"San Francisco Bay Area Stadium" },
+  { id:"f9",  date:"2026-06-18", time:"20:00 BST", teamA:"switzerland",   teamB:"bosnia",         stage:"Group B", venue:"Los Angeles Stadium" },
+  { id:"f10", date:"2026-06-18", time:"23:00 BST", teamA:"canada",        teamB:"qatar",          stage:"Group B", venue:"BC Place, Vancouver" },
+  { id:"f11", date:"2026-06-24", time:"20:00 BST", teamA:"switzerland",   teamB:"canada",         stage:"Group B", venue:"BC Place, Vancouver" },
+  { id:"f12", date:"2026-06-24", time:"20:00 BST", teamA:"bosnia",        teamB:"qatar",          stage:"Group B", venue:"Seattle Stadium" },
+  { id:"f13", date:"2026-06-13", time:"23:00 BST", teamA:"brazil",        teamB:"morocco",        stage:"Group C", venue:"New York New Jersey Stadium" },
+  { id:"f14", date:"2026-06-14", time:"02:00 BST", teamA:"haiti",         teamB:"scotland",       stage:"Group C", venue:"Boston Stadium" },
+  { id:"f15", date:"2026-06-19", time:"23:00 BST", teamA:"scotland",      teamB:"morocco",        stage:"Group C", venue:"Boston Stadium" },
+  { id:"f16", date:"2026-06-20", time:"02:00 BST", teamA:"brazil",        teamB:"haiti",          stage:"Group C", venue:"Philadelphia Stadium" },
+  { id:"f17", date:"2026-06-24", time:"23:00 BST", teamA:"morocco",       teamB:"haiti",          stage:"Group C", venue:"Atlanta Stadium" },
+  { id:"f18", date:"2026-06-24", time:"23:00 BST", teamA:"scotland",      teamB:"brazil",         stage:"Group C", venue:"Miami Stadium" },
+  { id:"f19", date:"2026-06-13", time:"01:00 BST", teamA:"usa",           teamB:"paraguay",       stage:"Group D", venue:"Los Angeles Stadium" },
+  { id:"f20", date:"2026-06-14", time:"05:00 BST", teamA:"australia",     teamB:"turkey",         stage:"Group D", venue:"BC Place, Vancouver" },
+  { id:"f21", date:"2026-06-19", time:"20:00 BST", teamA:"usa",           teamB:"australia",      stage:"Group D", venue:"Seattle Stadium" },
+  { id:"f22", date:"2026-06-20", time:"05:00 BST", teamA:"turkey",        teamB:"paraguay",       stage:"Group D", venue:"San Francisco Bay Area Stadium" },
+  { id:"f23", date:"2026-06-26", time:"03:00 BST", teamA:"turkey",        teamB:"usa",            stage:"Group D", venue:"Los Angeles Stadium" },
+  { id:"f24", date:"2026-06-26", time:"03:00 BST", teamA:"paraguay",      teamB:"australia",      stage:"Group D", venue:"San Francisco Bay Area Stadium" },
+  { id:"f25", date:"2026-06-14", time:"18:00 BST", teamA:"germany",       teamB:"curacao",        stage:"Group E", venue:"Houston Stadium" },
+  { id:"f26", date:"2026-06-15", time:"00:00 BST", teamA:"ivory-coast",   teamB:"ecuador",        stage:"Group E", venue:"Philadelphia Stadium" },
+  { id:"f27", date:"2026-06-20", time:"21:00 BST", teamA:"germany",       teamB:"ivory-coast",    stage:"Group E", venue:"Toronto Stadium" },
+  { id:"f28", date:"2026-06-21", time:"01:00 BST", teamA:"ecuador",       teamB:"curacao",        stage:"Group E", venue:"Kansas City Stadium" },
+  { id:"f29", date:"2026-06-25", time:"21:00 BST", teamA:"curacao",       teamB:"ivory-coast",    stage:"Group E", venue:"Philadelphia Stadium" },
+  { id:"f30", date:"2026-06-25", time:"21:00 BST", teamA:"ecuador",       teamB:"germany",        stage:"Group E", venue:"New York New Jersey Stadium" },
+  { id:"f31", date:"2026-06-14", time:"21:00 BST", teamA:"netherlands",   teamB:"japan",          stage:"Group F", venue:"Dallas Stadium" },
+  { id:"f32", date:"2026-06-15", time:"03:00 BST", teamA:"sweden",        teamB:"tunisia",        stage:"Group F", venue:"Estadio Monterrey" },
+  { id:"f33", date:"2026-06-20", time:"18:00 BST", teamA:"netherlands",   teamB:"sweden",         stage:"Group F", venue:"Houston Stadium" },
+  { id:"f34", date:"2026-06-21", time:"05:00 BST", teamA:"tunisia",       teamB:"japan",          stage:"Group F", venue:"Estadio Monterrey" },
+  { id:"f35", date:"2026-06-26", time:"00:00 BST", teamA:"japan",         teamB:"sweden",         stage:"Group F", venue:"Dallas Stadium" },
+  { id:"f36", date:"2026-06-26", time:"00:00 BST", teamA:"tunisia",       teamB:"netherlands",    stage:"Group F", venue:"Kansas City Stadium" },
+  { id:"f37", date:"2026-06-15", time:"20:00 BST", teamA:"belgium",       teamB:"egypt",          stage:"Group G", venue:"Seattle Stadium" },
+  { id:"f38", date:"2026-06-16", time:"02:00 BST", teamA:"iran",          teamB:"new-zealand",    stage:"Group G", venue:"Los Angeles Stadium" },
+  { id:"f39", date:"2026-06-21", time:"20:00 BST", teamA:"belgium",       teamB:"iran",           stage:"Group G", venue:"Los Angeles Stadium" },
+  { id:"f40", date:"2026-06-22", time:"02:00 BST", teamA:"new-zealand",   teamB:"egypt",          stage:"Group G", venue:"BC Place, Vancouver" },
+  { id:"f41", date:"2026-06-27", time:"04:00 BST", teamA:"egypt",         teamB:"iran",           stage:"Group G", venue:"Seattle Stadium" },
+  { id:"f42", date:"2026-06-27", time:"04:00 BST", teamA:"new-zealand",   teamB:"belgium",        stage:"Group G", venue:"BC Place, Vancouver" },
+  { id:"f43", date:"2026-06-15", time:"17:00 BST", teamA:"spain",         teamB:"cape-verde",     stage:"Group H", venue:"Atlanta Stadium" },
+  { id:"f44", date:"2026-06-15", time:"23:00 BST", teamA:"saudi-arabia",  teamB:"uruguay",        stage:"Group H", venue:"Miami Stadium" },
+  { id:"f45", date:"2026-06-21", time:"17:00 BST", teamA:"spain",         teamB:"saudi-arabia",   stage:"Group H", venue:"Atlanta Stadium" },
+  { id:"f46", date:"2026-06-21", time:"23:00 BST", teamA:"uruguay",       teamB:"cape-verde",     stage:"Group H", venue:"Miami Stadium" },
+  { id:"f47", date:"2026-06-27", time:"01:00 BST", teamA:"cape-verde",    teamB:"saudi-arabia",   stage:"Group H", venue:"Houston Stadium" },
+  { id:"f48", date:"2026-06-27", time:"01:00 BST", teamA:"uruguay",       teamB:"spain",          stage:"Group H", venue:"Estadio Guadalajara" },
+  { id:"f49", date:"2026-06-16", time:"20:00 BST", teamA:"france",        teamB:"senegal",        stage:"Group I", venue:"New York New Jersey Stadium" },
+  { id:"f50", date:"2026-06-16", time:"23:00 BST", teamA:"iraq",          teamB:"norway",         stage:"Group I", venue:"Boston Stadium" },
+  { id:"f51", date:"2026-06-23", time:"01:00 BST", teamA:"norway",        teamB:"senegal",        stage:"Group I", venue:"Toronto Stadium" },
+  { id:"f52", date:"2026-06-22", time:"22:00 BST", teamA:"france",        teamB:"iraq",           stage:"Group I", venue:"Philadelphia Stadium" },
+  { id:"f53", date:"2026-06-26", time:"20:00 BST", teamA:"norway",        teamB:"france",         stage:"Group I", venue:"Boston Stadium" },
+  { id:"f54", date:"2026-06-26", time:"20:00 BST", teamA:"senegal",       teamB:"iraq",           stage:"Group I", venue:"Toronto Stadium" },
+  { id:"f55", date:"2026-06-17", time:"02:00 BST", teamA:"argentina",     teamB:"algeria",        stage:"Group J", venue:"Kansas City Stadium" },
+  { id:"f56", date:"2026-06-17", time:"05:00 BST", teamA:"austria",       teamB:"jordan",         stage:"Group J", venue:"San Francisco Bay Area Stadium" },
+  { id:"f57", date:"2026-06-22", time:"18:00 BST", teamA:"argentina",     teamB:"austria",        stage:"Group J", venue:"Dallas Stadium" },
+  { id:"f58", date:"2026-06-23", time:"04:00 BST", teamA:"jordan",        teamB:"algeria",        stage:"Group J", venue:"San Francisco Bay Area Stadium" },
+  { id:"f59", date:"2026-06-28", time:"03:00 BST", teamA:"algeria",       teamB:"austria",        stage:"Group J", venue:"Kansas City Stadium" },
+  { id:"f60", date:"2026-06-28", time:"03:00 BST", teamA:"jordan",        teamB:"argentina",      stage:"Group J", venue:"Dallas Stadium" },
+  { id:"f61", date:"2026-06-17", time:"18:00 BST", teamA:"portugal",      teamB:"dr-congo",       stage:"Group K", venue:"Houston Stadium" },
+  { id:"f62", date:"2026-06-18", time:"03:00 BST", teamA:"uzbekistan",    teamB:"colombia",       stage:"Group K", venue:"Mexico City Stadium" },
+  { id:"f63", date:"2026-06-23", time:"18:00 BST", teamA:"portugal",      teamB:"uzbekistan",     stage:"Group K", venue:"Houston Stadium" },
+  { id:"f64", date:"2026-06-24", time:"03:00 BST", teamA:"colombia",      teamB:"dr-congo",       stage:"Group K", venue:"Estadio Guadalajara" },
+  { id:"f65", date:"2026-06-28", time:"00:30 BST", teamA:"colombia",      teamB:"portugal",       stage:"Group K", venue:"Miami Stadium" },
+  { id:"f66", date:"2026-06-28", time:"00:30 BST", teamA:"dr-congo",      teamB:"uzbekistan",     stage:"Group K", venue:"Atlanta Stadium" },
+  { id:"f67", date:"2026-06-17", time:"21:00 BST", teamA:"england",       teamB:"croatia",        stage:"Group L", venue:"Dallas Stadium" },
+  { id:"f68", date:"2026-06-18", time:"00:00 BST", teamA:"ghana",         teamB:"panama",         stage:"Group L", venue:"Toronto Stadium" },
+  { id:"f69", date:"2026-06-23", time:"21:00 BST", teamA:"england",       teamB:"ghana",          stage:"Group L", venue:"Boston Stadium" },
+  { id:"f70", date:"2026-06-24", time:"00:00 BST", teamA:"panama",        teamB:"croatia",        stage:"Group L", venue:"Boston Stadium" },
+  { id:"f71", date:"2026-06-27", time:"22:00 BST", teamA:"panama",        teamB:"england",        stage:"Group L", venue:"New York New Jersey Stadium" },
+  { id:"f72", date:"2026-06-27", time:"22:00 BST", teamA:"croatia",       teamB:"ghana",          stage:"Group L", venue:"Philadelphia Stadium" },
+  { id:"r32-1",  date:"2026-06-28", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 1",  venue:"Los Angeles Stadium" },
+  { id:"r32-2",  date:"2026-06-29", time:"18:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 2",  venue:"Houston Stadium" },
+  { id:"r32-3",  date:"2026-06-29", time:"21:30 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 3",  venue:"Boston Stadium" },
+  { id:"r32-4",  date:"2026-06-30", time:"02:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 4",  venue:"Estadio Monterrey" },
+  { id:"r32-5",  date:"2026-06-30", time:"18:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 5",  venue:"Dallas Stadium" },
+  { id:"r32-6",  date:"2026-06-30", time:"22:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 6",  venue:"New York New Jersey Stadium" },
+  { id:"r32-7",  date:"2026-07-01", time:"02:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 7",  venue:"Mexico City Stadium" },
+  { id:"r32-8",  date:"2026-07-01", time:"17:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 8",  venue:"Atlanta Stadium" },
+  { id:"r32-9",  date:"2026-07-01", time:"21:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 9",  venue:"Seattle Stadium" },
+  { id:"r32-10", date:"2026-07-02", time:"01:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 10", venue:"San Francisco Bay Area Stadium" },
+  { id:"r32-11", date:"2026-07-02", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 11", venue:"Los Angeles Stadium" },
+  { id:"r32-12", date:"2026-07-03", time:"00:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 12", venue:"Toronto Stadium" },
+  { id:"r32-13", date:"2026-07-03", time:"04:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 13", venue:"BC Place, Vancouver" },
+  { id:"r32-14", date:"2026-07-03", time:"19:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 14", venue:"Dallas Stadium" },
+  { id:"r32-15", date:"2026-07-03", time:"23:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 15", venue:"Miami Stadium" },
+  { id:"r32-16", date:"2026-07-04", time:"01:30 BST", teamA:"tba", teamB:"tba", stage:"Round of 32 - Match 16", venue:"BC Place, Vancouver" },
+  { id:"r16-1", date:"2026-07-04", time:"18:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 1", venue:"Houston Stadium" },
+  { id:"r16-2", date:"2026-07-04", time:"22:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 2", venue:"Philadelphia Stadium" },
+  { id:"r16-3", date:"2026-07-05", time:"21:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 3", venue:"New York New Jersey Stadium" },
+  { id:"r16-4", date:"2026-07-06", time:"01:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 4", venue:"Mexico City Stadium" },
+  { id:"r16-5", date:"2026-07-06", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 5", venue:"Dallas Stadium" },
+  { id:"r16-6", date:"2026-07-07", time:"01:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 6", venue:"Seattle Stadium" },
+  { id:"r16-7", date:"2026-07-07", time:"17:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 7", venue:"Atlanta Stadium" },
+  { id:"r16-8", date:"2026-07-07", time:"21:00 BST", teamA:"tba", teamB:"tba", stage:"Round of 16 - Match 8", venue:"BC Place, Vancouver" },
+  { id:"qf1", date:"2026-07-09", time:"21:00 BST", teamA:"tba", teamB:"tba", stage:"Quarter Final 1", venue:"Boston Stadium" },
+  { id:"qf2", date:"2026-07-10", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Quarter Final 2", venue:"Los Angeles Stadium" },
+  { id:"qf3", date:"2026-07-11", time:"22:00 BST", teamA:"tba", teamB:"tba", stage:"Quarter Final 3", venue:"Miami Stadium" },
+  { id:"qf4", date:"2026-07-12", time:"02:00 BST", teamA:"tba", teamB:"tba", stage:"Quarter Final 4", venue:"Kansas City Stadium" },
+  { id:"sf1", date:"2026-07-14", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Semi Final 1", venue:"Dallas Stadium" },
+  { id:"sf2", date:"2026-07-15", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"Semi Final 2", venue:"Atlanta Stadium" },
+  { id:"3rd", date:"2026-07-18", time:"22:00 BST", teamA:"tba", teamB:"tba", stage:"Third Place Play-off", venue:"Miami Stadium" },
+  { id:"fin", date:"2026-07-19", time:"20:00 BST", teamA:"tba", teamB:"tba", stage:"🏆 Final", venue:"New York New Jersey Stadium" },
+];
+
+async function fetchJson(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const req = https.request({
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method: options.method || 'GET',
+      headers: options.headers || {},
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve(data); } });
+    });
+    req.on('error', reject);
+    if (options.body) req.write(options.body);
+    req.end();
+  });
+}
+
+async function main() {
+  console.log('Fetching existing sweepstake...');
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/sweepstakes?sw_id=eq.${SW_ID}&select=data`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!rows || rows.length === 0) { console.log('Not found!'); return; }
+  const sw = JSON.parse(rows[0].data);
+  console.log(`Found: ${sw.name} with ${sw.players.length} players`);
+  sw.fixtures = FIXTURES;
+  if (!sw.awards) sw.awards = {};
+  if (!sw.knockoutBonuses) sw.knockoutBonuses = {};
+  await fetchJson(`${SUPABASE_URL}/rest/v1/sweepstakes?sw_id=eq.${SW_ID}`, {
+    method: 'PATCH',
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: JSON.stringify(sw) }),
+  });
+  console.log(`✅ Done! ${FIXTURES.length} fixtures updated with BST times!`);
+}
+
+main().catch(console.error);
