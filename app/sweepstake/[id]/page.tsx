@@ -146,6 +146,9 @@ export default function SweepstakePage({ params }: { params: Promise<{ id: strin
   const ranked = [...sw.players].sort((a, b) => b.points - a.points);
   const sortedTeams = [...TEAMS_2026].sort((a, b) => a.name.localeCompare(b.name));
   const round32Fixtures = sw.fixtures.filter((f) => f.stage.startsWith("Round of 32"));
+  const round16Fixtures = sw.fixtures.filter((f) => f.stage.startsWith("Round of 16"));
+  const quarterFinalFixtures = sw.fixtures.filter((f) => f.stage.startsWith("Quarter Final"));
+  const otherKnockoutFixtures = sw.fixtures.filter((f) => f.stage.startsWith("Semi Final") || f.stage.includes("Third Place") || f.stage.includes("Final") && !f.stage.startsWith("Quarter"));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -409,6 +412,132 @@ export default function SweepstakePage({ params }: { params: Promise<{ id: strin
                 </div>
 
                 <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <h3 className="font-bold text-gray-900 mb-1">🥅 Set Round of 16 Teams</h3>
+                  <p className="text-sm text-gray-500 mb-4">Pick the two teams for each Round of 16 match.</p>
+                  <div className="space-y-3">
+                    {round16Fixtures.map((fixture) => {
+                      const tA = getTeam(fixture.teamA);
+                      const tB = getTeam(fixture.teamB);
+                      return (
+                        <div key={fixture.id} className="p-3 rounded-xl border border-gray-200 bg-gray-50">
+                          <div className="text-xs text-gray-500 mb-2">{fixture.stage} · {formatDate(fixture.date)} · {fixture.time}</div>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={fixture.teamA === "tba" ? "" : fixture.teamA}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamA", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team A...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                            <span className="text-gray-400 font-bold text-sm">vs</span>
+                            <select
+                              value={fixture.teamB === "tba" ? "" : fixture.teamB}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamB", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team B...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {tA && tB && (
+                            <div className="text-xs text-green-600 font-medium mt-2">✓ {tA.flag} {tA.name} vs {tB.flag} {tB.name}</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <h3 className="font-bold text-gray-900 mb-1">🥅 Set Quarter Final Teams</h3>
+                  <p className="text-sm text-gray-500 mb-4">Pick the two teams for each Quarter Final.</p>
+                  <div className="space-y-3">
+                    {quarterFinalFixtures.map((fixture) => {
+                      const tA = getTeam(fixture.teamA);
+                      const tB = getTeam(fixture.teamB);
+                      return (
+                        <div key={fixture.id} className="p-3 rounded-xl border border-gray-200 bg-gray-50">
+                          <div className="text-xs text-gray-500 mb-2">{fixture.stage} · {formatDate(fixture.date)} · {fixture.time}</div>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={fixture.teamA === "tba" ? "" : fixture.teamA}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamA", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team A...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                            <span className="text-gray-400 font-bold text-sm">vs</span>
+                            <select
+                              value={fixture.teamB === "tba" ? "" : fixture.teamB}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamB", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team B...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {tA && tB && (
+                            <div className="text-xs text-green-600 font-medium mt-2">✓ {tA.flag} {tA.name} vs {tB.flag} {tB.name}</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <h3 className="font-bold text-gray-900 mb-1">🥅 Set Semi Final, 3rd Place & Final Teams</h3>
+                  <p className="text-sm text-gray-500 mb-4">Pick the two teams for each remaining fixture.</p>
+                  <div className="space-y-3">
+                    {otherKnockoutFixtures.map((fixture) => {
+                      const tA = getTeam(fixture.teamA);
+                      const tB = getTeam(fixture.teamB);
+                      return (
+                        <div key={fixture.id} className="p-3 rounded-xl border border-gray-200 bg-gray-50">
+                          <div className="text-xs text-gray-500 mb-2">{fixture.stage} · {formatDate(fixture.date)} · {fixture.time}</div>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={fixture.teamA === "tba" ? "" : fixture.teamA}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamA", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team A...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                            <span className="text-gray-400 font-bold text-sm">vs</span>
+                            <select
+                              value={fixture.teamB === "tba" ? "" : fixture.teamB}
+                              onChange={(e) => handleSetFixtureTeam(fixture.id, "teamB", e.target.value || "tba")}
+                              className="flex-1 border-2 border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white focus:border-green-500 focus:outline-none"
+                            >
+                              <option value="">Select team B...</option>
+                              {sortedTeams.map((t) => (
+                                <option key={t.id} value={t.id}>{t.flag} {t.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {tA && tB && (
+                            <div className="text-xs text-green-600 font-medium mt-2">✓ {tA.flag} {tA.name} vs {tB.flag} {tB.name}</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                   <h3 className="font-bold text-gray-900 mb-1">Enter Results</h3>
                   <p className="text-sm text-gray-500 mb-4">Enter scores to update the leaderboard.</p>
                   <div className="space-y-3">
@@ -445,6 +574,7 @@ export default function SweepstakePage({ params }: { params: Promise<{ id: strin
                   <p className="text-sm text-gray-500 mb-4">Award bonus points as teams progress.</p>
                   <div className="space-y-3">
                     {[
+                      { key: "roundOf32", label: "Round of 32", pts: POINTS_SYSTEM.roundOf32 },
                       { key: "roundOf16", label: "Round of 16", pts: POINTS_SYSTEM.roundOf16 },
                       { key: "quarterFinal", label: "Quarter Final", pts: POINTS_SYSTEM.quarterFinal },
                       { key: "semiFinal", label: "Semi Final", pts: POINTS_SYSTEM.semiFinal },
